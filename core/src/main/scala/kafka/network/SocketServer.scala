@@ -541,6 +541,10 @@ private[kafka] class Acceptor(val endPoint: EndPoint,
                 iter.remove()
 
                 if (key.isAcceptable) {
+                  // IMPORTANT
+                  //  accept(key):  Accept a new connection， ServerSocketChannel 为该连接分配一个SocketChannel.
+                  //  将该SocketChannel压入 processors 的新建连接队列中。也即将该连接交给 processor 处理
+                  //
                   accept(key).foreach { socketChannel =>
 
                     // Assign the channel to the next processor (using round-robin) to which the
@@ -629,6 +633,8 @@ private[kafka] class Acceptor(val endPoint: EndPoint,
     }
   }
 
+  //IMPORTANT
+  // processor 接收 socketChannel.  Processor 也是一个线程。
   private def assignNewConnection(socketChannel: SocketChannel, processor: Processor, mayBlock: Boolean): Boolean = {
     if (processor.accept(socketChannel, mayBlock, blockedPercentMeter)) {
       debug(s"Accepted connection from ${socketChannel.socket.getRemoteSocketAddress} on" +

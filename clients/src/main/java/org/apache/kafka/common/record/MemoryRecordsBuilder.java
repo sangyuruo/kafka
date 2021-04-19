@@ -628,7 +628,9 @@ public class MemoryRecordsBuilder implements AutoCloseable {
         ensureOpenForRecordAppend();
         int offsetDelta = (int) (offset - baseOffset);
         long timestampDelta = timestamp - firstTimestamp;
+        // 写入消息到内存中
         int sizeInBytes = DefaultRecord.writeTo(appendStream, offsetDelta, timestampDelta, key, value, headers);
+        // 记录本次写入，并维护当前内存队列状态
         recordWritten(offset, timestamp, sizeInBytes);
     }
 
@@ -654,6 +656,7 @@ public class MemoryRecordsBuilder implements AutoCloseable {
         return offset;
     }
 
+    // 更改状态，记录本次写入
     private void recordWritten(long offset, long timestamp, int size) {
         if (numRecords == Integer.MAX_VALUE)
             throw new IllegalArgumentException("Maximum number of records per batch exceeded, max records: " + Integer.MAX_VALUE);

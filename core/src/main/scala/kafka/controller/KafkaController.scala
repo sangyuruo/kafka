@@ -277,6 +277,7 @@ class KafkaController(val config: KafkaConfig,
    * required to clean up internal controller data structures
    */
   private def onControllerResignation(): Unit = {
+    // IMPORTANT zk lead 选举当前节点为Controller后，触发本方法(callback方式)
     debug("Resigning")
     // de-register listeners
     zkClient.unregisterZNodeChildChangeHandler(isrChangeNotificationHandler.path)
@@ -1073,6 +1074,9 @@ class KafkaController(val config: KafkaConfig,
     }
   }
 
+  /**
+    * 自动执行副本Leader选举
+    */
   private def processAutoPreferredReplicaLeaderElection(): Unit = {
     if (!isActive) return
     try {
@@ -1083,6 +1087,9 @@ class KafkaController(val config: KafkaConfig,
     }
   }
 
+  /**
+    * Unclean副本Leader选举
+    */
   private def processUncleanLeaderElectionEnable(): Unit = {
     if (!isActive) return
     info("Unclean leader election has been enabled by default")
@@ -1805,7 +1812,7 @@ class KafkaController(val config: KafkaConfig,
     onControllerResignation()
   }
 
-
+  // IMPORTANT 执行 event
   override def process(event: ControllerEvent): Unit = {
     try {
       event match {

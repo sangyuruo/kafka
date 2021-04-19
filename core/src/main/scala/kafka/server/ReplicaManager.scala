@@ -232,6 +232,7 @@ class ReplicaManager(val config: KafkaConfig,
   }
 
   // Visible for testing
+  //IMPORTANT 选择副本规则
   private[server] val replicaSelectorOpt: Option[ReplicaSelector] = createReplicaSelector()
 
   newGauge("LeaderCount", () => leaderPartitionsIterator.size)
@@ -263,12 +264,14 @@ class ReplicaManager(val config: KafkaConfig,
     }
   }
   /**
+    * 需要传播 ISR 变化的情况
    * This function periodically runs to see if ISR needs to be propagated. It propagates ISR when:
    * 1. There is ISR change not propagated yet.
    * 2. There is no ISR Change in the last five seconds, or it has been more than 60 seconds since the last ISR propagation.
    * This allows an occasional ISR change to be propagated within a few seconds, and avoids overwhelming controller and
    * other brokers when large amount of ISR change occurs.
    */
+  //TODO  重要功能
   def maybePropagateIsrChanges(): Unit = {
     val now = System.currentTimeMillis()
     isrChangeSet synchronized {
@@ -483,6 +486,7 @@ class ReplicaManager(val config: KafkaConfig,
     localLog(topicPartition).map(_.dir.getParent)
   }
 
+  //TODO  重要功能
   /**
    * Append messages to leader replicas of the partition, and wait for them to be replicated to other replicas;
    * the callback function will be triggered either when timeout or the required acks are satisfied;
@@ -1581,6 +1585,7 @@ class ReplicaManager(val config: KafkaConfig,
     nonOfflinePartition(topicPartition).flatMap(_.leaderLogIfLocal.map(_.logEndOffset))
 
   // Flushes the highwatermark value for all partitions to the highwatermark file
+  // IMPORTANT 将所有partitions 的高水位 flush 到磁盘中
   def checkpointHighWatermarks(): Unit = {
     val localLogs = nonOfflinePartitionsIterator.flatMap { partition =>
       val logsList: mutable.Set[Log] = mutable.Set()

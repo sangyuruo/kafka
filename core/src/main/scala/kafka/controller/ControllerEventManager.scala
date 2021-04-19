@@ -29,6 +29,11 @@ import org.apache.kafka.common.utils.Time
 import scala.collection._
 import scala.collection.JavaConverters._
 
+//IMPORTANT 处理Controller 事务管理
+/**
+  *  事件类:  QueuedEvent 对 ControllerEvent 进行了包装， 增加了超时特性
+  *  ControllerEventThread：  处理事件线程，从队列中获取从 controller 压入的事件，并处理它，注意最后会回调到 Controller 中的方法.
+  */
 object ControllerEventManager {
   val ControllerEventThreadName = "controller-event-thread"
   val EventQueueTimeMetricName = "EventQueueTimeMs"

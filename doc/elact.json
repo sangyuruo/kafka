@@ -1,0 +1,16 @@
+{
+  "partitions": [
+    {
+      "topic": "output_batch_msg",
+      "partition": 0
+    },
+    {
+      "topic": "output_batch_msg",
+      "partition": 1
+    },
+    {
+      "topic": "output_batch_msg",
+      "partition": 2
+    }
+  ]
+}

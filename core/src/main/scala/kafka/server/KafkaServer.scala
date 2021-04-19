@@ -162,7 +162,7 @@ class KafkaServer(val config: KafkaConfig, time: Time = Time.SYSTEM, threadNameP
 
   var transactionCoordinator: TransactionCoordinator = null
 
-  var kafkaController: KafkaController = null
+  var output_batch_msg: KafkaController = null
 
   var kafkaScheduler: KafkaScheduler = null
 
@@ -232,7 +232,7 @@ class KafkaServer(val config: KafkaConfig, time: Time = Time.SYSTEM, threadNameP
         // applied after DynamicConfigManager starts.
         config.dynamicConfig.initialize(zkClient)
 
-        /* start scheduler */
+        /* start scheduler, 启动任务调度，准备接收执行运行中的任务 */
         kafkaScheduler = new KafkaScheduler(config.backgroundThreads)
         kafkaScheduler.startup()
 
@@ -246,11 +246,23 @@ class KafkaServer(val config: KafkaConfig, time: Time = Time.SYSTEM, threadNameP
         val reporters = new util.ArrayList[MetricsReporter]
         reporters.add(jmxReporter)
         val metricConfig = KafkaServer.metricConfig(config)
+
+        /**
+          *  这个包并不是面向client提供服务的,他是为了给kafka中的其他组件,
+          *  比如replicaManager,PartitionManager,QuatoManager提供调用,
+          *  让这些Manager了解kafka现在的运行状况,以便作出相应决策的.
+          */
+        //IMPORTANT
         metrics = new Metrics(metricConfig, reporters, time, true)
 
         /* register broker metrics */
         _brokerTopicStats = new BrokerTopicStats
 
+        /**
+          * quotaManagers 是kafka中用来限制kafka,producer的传输速度的,
+          * 比如在config文件下设置producer不能以超过5MB/S的速度传输数据,那么这个限制就是通过quotaManager来实现的.
+          */
+        //IMPORTANT
         quotaManagers = QuotaFactory.instantiate(config, metrics, time, threadNamePrefix.getOrElse(""))
         notifyClusterListeners(kafkaMetricsReporters ++ metrics.reporters.asScala)
 

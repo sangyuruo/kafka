@@ -21,6 +21,7 @@ package org.apache.kafka.common.metrics;
  */
 public interface Stat {
 
+    //IMPORTANT 记录一个采样数值
     /**
      * Record the given value
      * @param config The configuration to use for this metric

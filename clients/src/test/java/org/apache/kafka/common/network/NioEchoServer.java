@@ -100,18 +100,18 @@ public class NioEchoServer extends Thread {
     }
 
     public NioEchoServer(ListenerName listenerName, SecurityProtocol securityProtocol, AbstractConfig config,
-            String serverHost, ChannelBuilder channelBuilder, CredentialCache credentialCache,
-            int failedAuthenticationDelayMs, Time time, DelegationTokenCache tokenCache) throws Exception {
-        super("echoserver");
-        setDaemon(true);
-        serverSocketChannel = ServerSocketChannel.open();
-        serverSocketChannel.configureBlocking(false);
-        serverSocketChannel.socket().bind(new InetSocketAddress(serverHost, 0));
-        this.port = serverSocketChannel.socket().getLocalPort();
-        this.socketChannels = Collections.synchronizedList(new ArrayList<SocketChannel>());
-        this.newChannels = Collections.synchronizedList(new ArrayList<SocketChannel>());
-        this.credentialCache = credentialCache;
-        this.tokenCache = tokenCache;
+                String serverHost, ChannelBuilder channelBuilder, CredentialCache credentialCache,
+        int failedAuthenticationDelayMs, Time time, DelegationTokenCache tokenCache) throws Exception {
+            super("echoserver");
+            setDaemon(true);
+            serverSocketChannel = ServerSocketChannel.open();
+            serverSocketChannel.configureBlocking(false);
+            serverSocketChannel.socket().bind(new InetSocketAddress(serverHost, 0));
+            this.port = serverSocketChannel.socket().getLocalPort();
+            this.socketChannels = Collections.synchronizedList(new ArrayList<SocketChannel>());
+            this.newChannels = Collections.synchronizedList(new ArrayList<SocketChannel>());
+            this.credentialCache = credentialCache;
+            this.tokenCache = tokenCache;
         if (securityProtocol == SecurityProtocol.SASL_PLAINTEXT || securityProtocol == SecurityProtocol.SASL_SSL) {
             for (String mechanism : ScramMechanism.mechanismNames()) {
                 if (credentialCache.cache(mechanism, ScramCredential.class) == null)
@@ -322,19 +322,19 @@ public class NioEchoServer extends Thread {
         public void run() {
             try {
                 java.nio.channels.Selector acceptSelector = java.nio.channels.Selector.open();
-                serverSocketChannel.register(acceptSelector, SelectionKey.OP_ACCEPT);
-                while (serverSocketChannel.isOpen()) {
-                    if (acceptSelector.select(1000) > 0) {
-                        Iterator<SelectionKey> it = acceptSelector.selectedKeys().iterator();
-                        while (it.hasNext()) {
-                            SelectionKey key = it.next();
-                            if (key.isAcceptable()) {
-                                SocketChannel socketChannel = ((ServerSocketChannel) key.channel()).accept();
-                                socketChannel.configureBlocking(false);
-                                newChannels.add(socketChannel);
-                                selector.wakeup();
-                            }
-                            it.remove();
+                            serverSocketChannel.register(acceptSelector, SelectionKey.OP_ACCEPT);
+                            while (serverSocketChannel.isOpen()) {
+                                if (acceptSelector.select(1000) > 0) {
+                                    Iterator<SelectionKey> it = acceptSelector.selectedKeys().iterator();
+                                    while (it.hasNext()) {
+                                        SelectionKey key = it.next();
+                                        if (key.isAcceptable()) {
+                                            SocketChannel socketChannel = ((ServerSocketChannel) key.channel()).accept();
+                                            socketChannel.configureBlocking(false);
+                                            newChannels.add(socketChannel);
+                                            selector.wakeup();
+                                        }
+                                        it.remove();
                         }
                     }
                 }

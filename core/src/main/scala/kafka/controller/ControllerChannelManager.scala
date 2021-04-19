@@ -46,6 +46,7 @@ object ControllerChannelManager {
   val RequestRateAndQueueTimeMetricName = "RequestRateAndQueueTimeMs"
 }
 
+//IMPORTANT 用来管理KafkaController Leader和集群中其他broker之间的网络交互， 底层调用 selector 的 send 方法.
 class ControllerChannelManager(controllerContext: ControllerContext,
                                config: KafkaConfig,
                                time: Time,
@@ -595,6 +596,17 @@ abstract class AbstractControllerBrokerRequestBatch(config: KafkaConfig,
   }
 }
 
+//IMPORTANT 表示Leader 与一个broker连接的各种信息
+/**
+  *
+  * @param networkClient  负责维护controller 和 对应broker之间的网络连接
+  * @param brokerNode  维护对应的broker的网络位置信息，其中保存了host、ip、port和机架信息
+  * @param messageQueue BlockingQueue[QueueItem] 缓冲队列，缓冲发往borker的请求
+  * @param requestSendThread RequestSendThread负责发送请求的线程
+  * @param queueSizeGauge
+  * @param requestRateAndTimeMetrics
+  * @param reconfigurableChannelBuilder
+  */
 case class ControllerBrokerStateInfo(networkClient: NetworkClient,
                                      brokerNode: Node,
                                      messageQueue: BlockingQueue[QueueItem],

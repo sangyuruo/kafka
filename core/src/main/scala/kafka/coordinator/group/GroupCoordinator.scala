@@ -40,6 +40,8 @@ import scala.math.max
 
 /**
  * GroupCoordinator handles general group membership and offset management.
+  * GroupCoordinator 处理消费组成员以及 offset 管理
+  * 每个 kafka server 都会初始化一个coordinator来协调 consumer group. 这些group 根据他们的 group name 来分配到对应coordinators
  *
  * Each Kafka server instantiates a coordinator which is responsible for a set of
  * groups. Groups are assigned to coordinators based on their group names.

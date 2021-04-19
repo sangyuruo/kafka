@@ -35,15 +35,22 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 
 /**
+ * 传感器，敏感元件，探测设备
+ * Sensor的作用不同KafkaMetric.
+ * KafkaMetric仅仅是返回某一个参数的值,而Sensor有基于某一参数时间序列进行统计的功能,比如平均值,最大值,最小值.
+ * 那这些统计又是如何实现的呢?答案是List<Stat> stats这个属性成员.
+ *
+ *
  * A sensor applies a continuous sequence of numerical values to a set of associated metrics. For example a sensor on
  * message size would record a sequence of message sizes using the {@link #record(double)} api and would maintain a set
  * of metrics about request sizes such as the average or max.
  */
 public final class Sensor {
-
+    //一个kafka broker就只有一个Metrics实例,这个registry就是对这个Metrics的引用
     private final Metrics registry;
     private final String name;
     private final Sensor[] parents;
+    //IMPORTANT 统计平均值，最大值，最小值等
     private final List<Stat> stats;
     private final Map<MetricName, KafkaMetric> metrics;
     private final MetricConfig config;
